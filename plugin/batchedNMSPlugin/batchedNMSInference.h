@@ -23,6 +23,6 @@ using namespace nvinfer1::plugin;
 pluginStatus_t nmsInference(cudaStream_t stream, int N, int boxesSize, int scoresSize, bool shareLocation,
     int backgroundLabelId, int numPredsPerClass, int numClasses, int topK, int keepTopK, float scoreThreshold,
     float iouThreshold, DataType DT_BBOX, const void* locData, DataType DT_SCORE, const void* confData, void* keepCount,
-    void* nmsedBoxes, void* nmsedScores, void* nmsedClasses, void* workspace, bool isNormalized = true,
+    void* nmsedBoxes, void* nmsedScores, void* nmsedClasses, void* nmsedIndices, void* workspace, bool isNormalized = true,
     bool confSigmoid = false, bool clipBoxes = true);
 #endif

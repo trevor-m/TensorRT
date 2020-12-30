@@ -34,6 +34,7 @@ __launch_bounds__(nthds_per_cta)
         T_BBOX* nmsedBoxes,
         T_BBOX* nmsedScores,
         T_BBOX* nmsedClasses,
+        int* nmsedIndices,
         bool clipBoxes
         )
 {
@@ -62,6 +63,7 @@ __launch_bounds__(nthds_per_cta)
             const int bboxOffset = imgId * (shareLocation ? numPredsPerClass : (numClasses * numPredsPerClass));
             const int bboxId = ((shareLocation ? (index % numPredsPerClass)
                         : index % (numClasses * numPredsPerClass)) + bboxOffset) * 4;
+            nmsedIndices[i] = index;
             nmsedClasses[i] = (index % (numClasses * numPredsPerClass)) / numPredsPerClass; // label
             nmsedScores[i] = score;                                                        // confidence score
             // clipped bbox xmin
@@ -97,6 +99,7 @@ pluginStatus_t gatherNMSOutputs_gpu(
     void* nmsedBoxes,
     void* nmsedScores,
     void* nmsedClasses,
+    void* nmsedIndices,
     bool clipBoxes
     )
 {
@@ -110,6 +113,7 @@ pluginStatus_t gatherNMSOutputs_gpu(
                                                                            (T_BBOX*) nmsedBoxes, 
                                                                            (T_BBOX*) nmsedScores, 
                                                                            (T_BBOX*) nmsedClasses,
+                                                                           (int*) nmsedIndices,
                                                                            clipBoxes
                                                                             );
 
@@ -131,6 +135,7 @@ typedef pluginStatus_t (*nmsOutFunc)(cudaStream_t,
                                void*,
                                void*,
                                void*, 
+                               void*,
                                void*,
                                bool);
 struct nmsOutLaunchConfig
@@ -188,6 +193,7 @@ pluginStatus_t gatherNMSOutputs(
     void* nmsedBoxes,
     void* nmsedScores,
     void* nmsedClasses,
+    void* nmsedIndices,
     bool clipBoxes
     )
 {
@@ -211,6 +217,7 @@ pluginStatus_t gatherNMSOutputs(
                                           nmsedBoxes,
                                           nmsedScores,
                                           nmsedClasses,
+                                          nmsedIndices,
                                           clipBoxes
                                           );
         }
